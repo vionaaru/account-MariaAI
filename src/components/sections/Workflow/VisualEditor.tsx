@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
   Save,
   FileJson,
-  Eye,
+  Upload,
   Trash2,
   ChevronDown,
   ChevronUp,
@@ -14,7 +14,9 @@ import {
   MessageSquare,
   Clock,
   Edit2,
-  AlertCircle
+  AlertCircle,
+  Check,
+  XCircle
 } from 'lucide-react';
 import {
   DndContext,
@@ -32,7 +34,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 // Types
 interface Stage {
@@ -82,6 +84,42 @@ interface BotConfig {
   stages: Stage[];
 }
 
+// Confirmation Modal Component
+function ConfirmationModal({ message, onConfirm, onCancel }: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-slate-800 rounded-xl shadow-xl p-6 max-w-md w-full mx-4"
+      >
+        <h3 className="text-xl font-semibold mb-4">{message}</h3>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2"
+          >
+            <XCircle className="w-5 h-5" />
+            <span>Cancel</span>
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+          >
+            <Check className="w-5 h-5" />
+            <span>Confirm</span>
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 // Modal Component
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
@@ -112,7 +150,7 @@ function SegmentFormModal({ segment, onSave, onClose }: {
   onSave: (segment: Segment) => void;
   onClose: () => void;
 }) {
-  const { register, handleSubmit, watch } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues: segment
   });
 
@@ -524,6 +562,9 @@ function SortableStageCard({ stage, index, onDelete, onToggle, isExpanded, onUpd
 export function VisualEditor() {
   const [activeTab, setActiveTab] = useState(0);
   const [expandedStages, setExpandedStages] = useState<string[]>([]);
+  const [configName, setConfigName] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [config, setConfig] = useState<BotConfig>({
     company: {
       lang: 'Русский',
@@ -659,28 +700,121 @@ export function VisualEditor() {
     URL.revokeObjectURL(url);
   };
 
+  const saveConfig = async () => {
+    if (!configName.trim()) {
+      alert('Please enter a config name');
+      return;
+    }
+
+    const fileName = `${configName.trim()}.json`;
+    const filePath = `/home/project/src/components/sections/Workflow/configs/${fileName}`;
+
+    try {
+      // Check if file exists
+      const response = await fetch(filePath);
+      if (response.ok) {
+        setShowConfirmation(true);
+        return;
+      }
+      await performSave();
+    } catch {
+      await performSave();
+    }
+  };
+
+  const performSave = async () => {
+    const fileName = `${configName.trim()}.json`;
+    const filePath = `/home/project/src/components/sections/Workflow/configs/${fileName}`;
+    const jsonString = JSON.stringify(config, null, 2);
+
+    try {
+      const response = await fetch(filePath, {
+        method: 'PUT',
+        body: jsonString,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        alert('Config saved successfully!');
+      } else {
+        throw new Error('Failed to save config');
+      }
+    } catch (error) {
+      alert('Error saving config: ' + error);
+    }
+  };
+
+  const handleImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const importedConfig = JSON.parse(text);
+      setConfig(importedConfig);
+      setConfigName(file.name.replace('.json', ''));
+      alert('Config imported successfully!');
+    } catch (error) {
+      alert('Error importing config: ' + error);
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="h-full">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Visual Editor</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold">Visual Editor</h2>
+          <input
+            type="text"
+            placeholder="Config Name"
+            className="px-4 py-2 bg-slate-700/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400/50"
+            value={configName}
+            onChange={(e) => setConfigName(e.target.value)}
+          />
+        </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={exportToJson}
+            onClick={() => exportToJson()}
             className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2"
           >
             <FileJson className="w-5 h-5" />
             <span>Export JSON</span>
           </button>
-          <button className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2">
-            <Eye className="w-5 h-5" />
-            <span>Preview</span>
+          <button
+            onClick={handleImport}
+            className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2"
+          >
+            <Upload className="w-5 h-5" />
+            <span>Import</span>
           </button>
-          <button className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors flex items-center gap-2">
+          <button
+            onClick={saveConfig}
+            className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+          >
             <Save className="w-5 h-5" />
             <span>Save</span>
           </button>
         </div>
       </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept=".json"
+        onChange={handleFileSelect}
+      />
 
       <Tabs
         selectedIndex={activeTab}
@@ -822,6 +956,19 @@ export function VisualEditor() {
           </div>
         </TabPanel>
       </Tabs>
+
+      <AnimatePresence>
+        {showConfirmation && (
+          <ConfirmationModal
+            message="A config with this name already exists. Do you want to overwrite it?"
+            onConfirm={() => {
+              setShowConfirmation(false);
+              performSave();
+            }}
+            onCancel={() => setShowConfirmation(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
