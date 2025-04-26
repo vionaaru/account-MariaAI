@@ -91,29 +91,51 @@ function ConfirmationModal({ message, onConfirm, onCancel }: {
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-slate-800 rounded-xl shadow-xl p-6 max-w-md w-full mx-4"
+        initial={{ opacity: 0, scale: 0.95, rotateY: -5 }}
+        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+        exit={{ opacity: 0, scale: 0.95, rotateY: 5 }}
+        className="bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-xl p-6 max-w-md w-full mx-4 relative border border-emerald-400/30"
+        style={{
+          perspective: "1000px",
+          transformStyle: "preserve-3d"
+        }}
       >
-        <h3 className="text-xl font-semibold mb-4">{message}</h3>
+        {/* Уголки с декоративными элементами */}
+        <div className="absolute top-0 left-0 w-12 h-12 border-t border-l border-emerald-400/40" />
+        <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-emerald-400/40" />
+        <div className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-emerald-400/40" />
+        <div className="absolute bottom-0 right-0 w-12 h-12 border-b border-r border-emerald-400/40" />
+        
+        {/* Светящаяся линия сверху */}
+        <div className="absolute top-0 left-4 right-4 h-0.5 overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-400/60 to-emerald-500/0" 
+            style={{ animation: "glowScan 3s linear infinite" }} 
+          />
+        </div>
+        
+        <h3 className="text-xl font-semibold mb-6 text-emerald-400/90">{message}</h3>
         <div className="flex justify-end gap-3">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 0 8px rgba(52,211,153,0.4)" }}
+            whileTap={{ scale: 0.95 }}
             onClick={onCancel}
-            className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2"
+            className="futuristic-btn px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-all flex items-center gap-2"
           >
             <XCircle className="w-5 h-5" />
-            <span>Cancel</span>
-          </button>
-          <button
+            <span>Отмена</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 0 10px rgba(52,211,153,0.6)" }}
+            whileTap={{ scale: 0.95 }}
             onClick={onConfirm}
-            className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+            className="futuristic-btn px-4 py-2 bg-emerald-400/80 text-slate-900 rounded-lg hover:bg-emerald-400 transition-all flex items-center gap-2"
           >
             <Check className="w-5 h-5" />
-            <span>Confirm</span>
-          </button>
+            <span>Подтвердить</span>
+          </motion.button>
         </div>
       </motion.div>
     </div>
@@ -123,20 +145,35 @@ function ConfirmationModal({ message, onConfirm, onCancel }: {
 // Modal Component
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-slate-800 rounded-xl shadow-xl max-w-2xl w-full mx-4"
+        initial={{ opacity: 0, scale: 0.95, rotateX: 2 }}
+        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+        exit={{ opacity: 0, scale: 0.95, rotateX: -2 }}
+        className="bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-xl max-w-2xl w-full mx-4 border border-emerald-400/30 overflow-hidden"
+        style={{
+          perspective: "1000px",
+          transformStyle: "preserve-3d"
+        }}
       >
         <div className="relative">
-          <button
+          {/* Декоративная линия сверху */}
+          <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden">
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-400/60 to-emerald-500/0" 
+              style={{ animation: "glowScan 3s linear infinite" }} 
+            />
+          </div>
+          
+          <motion.button
+            whileHover={{ scale: 1.2, boxShadow: "0 0 15px rgba(52,211,153,0.5)" }}
+            whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="absolute right-4 top-4 p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
+            className="absolute right-4 top-4 w-8 h-8 rounded-full bg-slate-800/90 border border-emerald-400/30 flex items-center justify-center z-50 group transition-all"
           >
-            <X className="w-5 h-5" />
-          </button>
+            <X className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
+            <div className="absolute inset-0 rounded-full bg-emerald-400/10 group-hover:bg-emerald-400/30 transition-colors" />
+          </motion.button>
           {children}
         </div>
       </motion.div>
@@ -157,55 +194,59 @@ function SegmentFormModal({ segment, onSave, onClose }: {
   return (
     <Modal onClose={onClose}>
       <div className="p-6">
-        <h3 className="text-xl font-semibold mb-6">Edit Segment</h3>
+        <h3 className="text-xl font-semibold mb-6 text-emerald-400/90">Редактирование сегмента</h3>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">
-              Type
+              Тип
             </label>
             <input
               {...register('type')}
-              className="w-full bg-slate-700/30 rounded-lg p-2"
+              className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">
-              Description
+              Описание
             </label>
             <textarea
               {...register('description')}
-              className="w-full bg-slate-700/30 rounded-lg p-2"
+              className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
               rows={3}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">
-              Examples
+              Примеры
             </label>
             <div className="space-y-2">
               {segment.examples.map((_, index) => (
                 <input
                   key={index}
                   {...register(`examples.${index}`)}
-                  className="w-full bg-slate-700/30 rounded-lg p-2"
+                  className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
                 />
               ))}
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onClose}
-              className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors"
+              className="futuristic-btn px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-all"
             >
-              Cancel
-            </button>
-            <button
+              Отмена
+            </motion.button>
+            <motion.button
               type="submit"
-              className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 10px rgba(52,211,153,0.5)" }}
+              whileTap={{ scale: 0.95 }}
+              className="futuristic-btn px-4 py-2 bg-emerald-400/80 text-slate-900 rounded-lg hover:bg-emerald-400 transition-all"
             >
-              Save Changes
-            </button>
+              Сохранить изменения
+            </motion.button>
           </div>
         </form>
       </div>
@@ -226,62 +267,66 @@ function WakeupFormModal({ wakeup, onSave, onClose }: {
   return (
     <Modal onClose={onClose}>
       <div className="p-6">
-        <h3 className="text-xl font-semibold mb-6">Edit Wakeup</h3>
+        <h3 className="text-xl font-semibold mb-6 text-emerald-400/90">Редактирование пробуждения</h3>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-1">
-                Trigger
+                Триггер
               </label>
               <input
                 {...register('trigger')}
-                className="w-full bg-slate-700/30 rounded-lg p-2"
+                className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-1">
-                Timer (seconds)
+                Таймер (секунды)
               </label>
               <input
                 type="number"
                 {...register('timer')}
-                className="w-full bg-slate-700/30 rounded-lg p-2"
+                className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
               />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">
-              Prompt
+              Подсказка
             </label>
             <textarea
               {...register('prompt')}
-              className="w-full bg-slate-700/30 rounded-lg p-2"
+              className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
               rows={3}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1">
-              Question
+              Вопрос
             </label>
             <input
               {...register('question')}
-              className="w-full bg-slate-700/30 rounded-lg p-2"
+              className="w-full futuristic-input bg-slate-700/30 rounded-lg p-2"
             />
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onClose}
-              className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors"
+              className="futuristic-btn px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-all"
             >
-              Cancel
-            </button>
-            <button
+              Отмена
+            </motion.button>
+            <motion.button
               type="submit"
-              className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 10px rgba(52,211,153,0.5)" }}
+              whileTap={{ scale: 0.95 }}
+              className="futuristic-btn px-4 py-2 bg-emerald-400/80 text-slate-900 rounded-lg hover:bg-emerald-400 transition-all"
             >
-              Save Changes
-            </button>
+              Сохранить изменения
+            </motion.button>
           </div>
         </form>
       </div>
@@ -328,9 +373,10 @@ function SortableStageCard({ stage, index, onDelete, onToggle, isExpanded, onUpd
   const handleWakeupSave = (updatedWakeup: Wakeup) => {
     const updatedStage = {
       ...stage,
-      wakeups: stage.wakeups.map((wake, idx) =>
-        wake === editingWakeup ? updatedWakeup : wake
-      )
+      wakeups: stage.wakeups.map((wake, idx) => {
+        const editingIndex = stage.wakeups.findIndex(w => w === editingWakeup);
+        return idx === editingIndex ? updatedWakeup : wake;
+      })
     };
     onUpdateStage(updatedStage);
     setEditingWakeup(null);
@@ -559,11 +605,14 @@ function SortableStageCard({ stage, index, onDelete, onToggle, isExpanded, onUpd
   );
 }
 
-export function VisualEditor() {
+interface VisualEditorProps {
+  onClose: () => void;
+}
+
+export function VisualEditor({ onClose }: VisualEditorProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [expandedStages, setExpandedStages] = useState<string[]>([]);
   const [configName, setConfigName] = useState('');
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [config, setConfig] = useState<BotConfig>({
     company: {
@@ -706,44 +755,31 @@ export function VisualEditor() {
       return;
     }
 
-    const fileName = `${configName.trim()}.json`;
-    const filePath = `/home/project/src/components/sections/Workflow/configs/${fileName}`;
-
     try {
-      // Check if file exists
-      const response = await fetch(filePath);
-      if (response.ok) {
-        setShowConfirmation(true);
-        return;
-      }
       await performSave();
-    } catch {
-      await performSave();
+    } catch (err) {
+      alert('Error saving config: ' + err);
     }
   };
 
   const performSave = async () => {
-    const fileName = `${configName.trim()}.json`;
-    const filePath = `/home/project/src/components/sections/Workflow/configs/${fileName}`;
-    const jsonString = JSON.stringify(config, null, 2);
-
-    try {
-      const response = await fetch(filePath, {
-        method: 'PUT',
-        body: jsonString,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        alert('Config saved successfully!');
-      } else {
-        throw new Error('Failed to save config');
+    const response = await fetch('/api/save-config', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: configName.trim(),
+        content: config
+      }),
+      headers: {
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      alert('Error saving config: ' + error);
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err?.error || 'Unknown error');
     }
+
+    alert('Config saved successfully!');
   };
 
   const handleImport = () => {
@@ -772,39 +808,47 @@ export function VisualEditor() {
 
   return (
     <div className="h-full">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold">Visual Editor</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
+            Визуальный редактор
+          </h2>
           <input
             type="text"
-            placeholder="Config Name"
-            className="px-4 py-2 bg-slate-700/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400/50"
+            placeholder="Имя конфигурации"
+            className="px-4 py-2 futuristic-input bg-slate-700/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400/50"
             value={configName}
             onChange={(e) => setConfigName(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-3">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 0 8px rgba(52,211,153,0.4)" }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => exportToJson()}
-            className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2"
+            className="futuristic-btn px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-all flex items-center gap-2 group"
           >
-            <FileJson className="w-5 h-5" />
-            <span>Export JSON</span>
-          </button>
-          <button
+            <FileJson className="w-5 h-5 group-hover:text-emerald-400 transition-colors" />
+            <span>Экспорт JSON</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 0 8px rgba(52,211,153,0.4)" }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleImport}
-            className="px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors flex items-center gap-2"
+            className="futuristic-btn px-4 py-2 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-all flex items-center gap-2 group"
           >
-            <Upload className="w-5 h-5" />
-            <span>Import</span>
-          </button>
-          <button
+            <Upload className="w-5 h-5 group-hover:text-emerald-400 transition-colors" />
+            <span>Импорт</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 0 10px rgba(52,211,153,0.5)" }}
+            whileTap={{ scale: 0.95 }}
             onClick={saveConfig}
-            className="px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+            className="futuristic-btn px-4 py-2 bg-emerald-400 text-slate-900 rounded-lg hover:bg-emerald-500 transition-all flex items-center gap-2"
           >
             <Save className="w-5 h-5" />
-            <span>Save</span>
-          </button>
+            <span>Сохранить</span>
+          </motion.button>
         </div>
       </div>
 
@@ -819,7 +863,7 @@ export function VisualEditor() {
       <Tabs
         selectedIndex={activeTab}
         onSelect={index => setActiveTab(index)}
-        className="h-[calc(100%-4rem)]"
+        className="h-[calc(100%-5rem)] px-6"
       >
         <TabList className="flex border-b border-slate-700/50 mb-6">
           <Tab
@@ -829,7 +873,7 @@ export function VisualEditor() {
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Bot Settings
+            Настройки бота
           </Tab>
           <Tab
             className={`px-4 py-2 focus:outline-none ${
@@ -838,7 +882,7 @@ export function VisualEditor() {
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Stages
+            Стадии
           </Tab>
         </TabList>
 
@@ -855,6 +899,7 @@ export function VisualEditor() {
                     type="text"
                     className="w-full bg-slate-700/30 rounded-lg p-2"
                     value={config.company.lang}
+
                     onChange={e => setConfig(prev => ({
                       ...prev,
                       company: { ...prev.company, lang: e.target.value }
@@ -925,10 +970,10 @@ export function VisualEditor() {
           <div className="space-y-4">
             <button
               onClick={addNewStage}
-              className="w-full px-4 py-3 bg-emerald-400/10 text-emerald-400 rounded-xl hover:bg-emerald-400/20 transition-colors flex items-center gap-2 justify-center"
+              className="w-full px-4 py-3 futuristic-btn bg-emerald-400/10 text-emerald-400 rounded-xl hover:bg-emerald-400/20 transition-all flex items-center gap-2 justify-center"
             >
               <Plus className="w-5 h-5" />
-              <span>Add New Stage</span>
+              <span>Добавить новую стадию</span>
             </button>
 
             <DndContext
@@ -956,19 +1001,6 @@ export function VisualEditor() {
           </div>
         </TabPanel>
       </Tabs>
-
-      <AnimatePresence>
-        {showConfirmation && (
-          <ConfirmationModal
-            message="A config with this name already exists. Do you want to overwrite it?"
-            onConfirm={() => {
-              setShowConfirmation(false);
-              performSave();
-            }}
-            onCancel={() => setShowConfirmation(false)}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
