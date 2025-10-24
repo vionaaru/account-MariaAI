@@ -9,7 +9,8 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "download-fonts": "mkdir -p public/fonts && curl -o public/fonts/neuropol.woff 'https://www.fontsface.com/download/neuropol-font-free-1/Neuropol%20X.woff' && curl -o public/fonts/xolonium.woff 'https://fontstorage.com/download/font/xolonium.woff'"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
